@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 
 @Configuration
@@ -40,17 +41,28 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    //Este bean incorporará el filtro de seguridad de json web token que creamos en nuestra clase anterior
+
     @Bean
     JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter();
     }
 
-    //Vamos a crear un bean el cual va a establecer una cadena de filtros de seguridad en nuestra aplicación.
-    // Y es aquí donde determinaremos los permisos segun los roles de usuarios para acceder a nuestra aplicación
+
+
+
+
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowCredentials(true);
+                    // Permite todas las origenes locales comunes
+                    config.addAllowedOrigin("http://localhost:5500");
+                    config.addAllowedOrigin("http://localhost");
+                    return config;
+                }))
+
                 .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         //Permitimos el manejo de excepciones
@@ -72,6 +84,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/sala/listarId/**").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/sala/eliminar/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/sala/actualizar").hasAuthority("ADMIN")
+
+                        // Endpoints de Asiento
+                        .requestMatchers(HttpMethod.POST, "/api/asiento/crear").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/asiento/listar").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/asiento/listarId/**").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/asiento/por-sala/**").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/asiento/disponibles/**").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/asiento/actualizar").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/asiento/eliminar/**").hasAuthority("ADMIN")
+
+
                             //sesiones
                         .requestMatchers(HttpMethod.POST, "/api/sesiones/crear").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/sesiones/listar").hasAnyAuthority("ADMIN", "USER")

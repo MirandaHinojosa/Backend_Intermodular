@@ -26,5 +26,4 @@ public class Salas {
     private Boolean estado;
 
 
-
 }

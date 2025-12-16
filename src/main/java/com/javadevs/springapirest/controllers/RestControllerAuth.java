@@ -71,7 +71,7 @@ public class RestControllerAuth {
         return new ResponseEntity<>("Registro de admin exitoso", HttpStatus.OK);
     }
 
-    //Método para poder logear un usuario y obtener un token
+    //Método para poder loguear un usuario y obtener un token
     @PostMapping("login")
     public ResponseEntity<DtoAuthRespuesta> login(@RequestBody DtoLogin dtoLogin) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
