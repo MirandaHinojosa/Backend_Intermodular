@@ -1,5 +1,6 @@
 package com.javadevs.springapirest.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,7 +38,9 @@ public class Asiento {
     @JoinColumn(
             name = "id_sala",
             nullable = false,
+
             foreignKey = @ForeignKey(name = "fk_asiento_sala")
     )
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Salas sala;
 }

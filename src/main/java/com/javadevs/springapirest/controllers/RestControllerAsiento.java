@@ -3,6 +3,7 @@ package com.javadevs.springapirest.controllers;
 import com.javadevs.springapirest.models.Asiento;
 import com.javadevs.springapirest.services.AsientoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,10 +22,14 @@ public class RestControllerAsiento {
 
     // Petición para crear un asiento
     @PostMapping(value = "crear", headers = "Accept=application/json")
-    public void crearAsiento(@RequestBody Asiento asiento) {
-        asientoService.crear(asiento);
+    public ResponseEntity<Asiento> crearAsiento(@RequestBody Asiento asiento) {
+        try {
+            Asiento nuevoAsiento = asientoService.crear(asiento);
+            return ResponseEntity.ok(nuevoAsiento);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
-
     // Petición para obtener todos los asientos en la BD
     @GetMapping(value = "listar", headers = "Accept=application/json")
     public List<Asiento> listarAsientos() {
@@ -33,12 +38,14 @@ public class RestControllerAsiento {
 
     // Petición para obtener asiento mediante "ID"
     @GetMapping(value = "listarId/{id}", headers = "Accept=application/json")
-    public Optional<Asiento> obtenerAsientoPorId(@PathVariable Long id) {
-        return asientoService.readOne(id);
+    public ResponseEntity<Asiento> obtenerAsientoPorId(@PathVariable Long id) {
+        Optional<Asiento> asiento = asientoService.readOne(id);
+        return asiento.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // Petición para obtener asientos por sala
-    @GetMapping(value = "por-sala/{idSala}", headers = "Accept=application/json")
+    @GetMapping(value = "porsala/{idSala}", headers = "Accept=application/json")
     public List<Asiento> obtenerAsientosPorSala(@PathVariable Long idSala) {
         return asientoService.findBySala(idSala);
     }
@@ -51,13 +58,23 @@ public class RestControllerAsiento {
 
     // Petición para actualizar un asiento
     @PutMapping(value = "actualizar", headers = "Accept=application/json")
-    public void actualizarAsiento(@RequestBody Asiento asiento) {
-        asientoService.update(asiento);
+    public ResponseEntity<Asiento> actualizarAsiento(@RequestBody Asiento asiento) {
+        try {
+            Asiento asientoActualizado = asientoService.update(asiento);
+            return ResponseEntity.ok(asientoActualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     // Petición para eliminar un asiento por "Id"
     @DeleteMapping(value = "eliminar/{id}", headers = "Accept=application/json")
-    public void eliminarAsiento(@PathVariable Long id) {
-        asientoService.delete(id);
+    public ResponseEntity<Void> eliminarAsiento(@PathVariable Long id) {
+        try {
+            asientoService.delete(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

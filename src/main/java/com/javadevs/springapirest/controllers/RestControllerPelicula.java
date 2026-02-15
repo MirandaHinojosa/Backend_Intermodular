@@ -27,8 +27,20 @@ public class RestControllerPelicula {
     }
 
     //Petición para obtener todos los pelicula en la BD
+    //@GetMapping(value = "listar", headers = "Accept=application/json")
+    //public List<Peliculas> listarPeliculas() {
+        //return peliService.readAll();
+    //}
+
+
     @GetMapping(value = "listar", headers = "Accept=application/json")
     public List<Peliculas> listarPeliculas() {
+        return peliService.readAllConSesionesFuturas();
+    }
+
+    //especifico para listar todas las pelicuals
+    @GetMapping(value = "listar-todas", headers = "Accept=application/json")
+    public List<Peliculas> listarTodasPeliculas() {
         return peliService.readAll();
     }
 
@@ -37,6 +49,8 @@ public class RestControllerPelicula {
     public Optional<Peliculas> obtenerPeliculaPorId(@PathVariable Long id) {
         return peliService.readOne(id);
     }
+
+
 
     //Petición para actualizar un pelicula
     @PutMapping(value = "actualizar", headers = "Accept=application/json")

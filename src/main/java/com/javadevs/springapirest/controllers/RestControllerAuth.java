@@ -14,27 +14,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth/")
 public class RestControllerAuth {
-
 
     private AuthenticationManager authenticationManager;
     private PasswordEncoder passwordEncoder;
     private IRolesRepository rolesRepository;
     private IUsuariosRepository usuariosRepository;
     private JwtGenerador jwtGenerador;
-    @Autowired
 
+    @Autowired
     public RestControllerAuth(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, IRolesRepository rolesRepository, IUsuariosRepository usuariosRepository, JwtGenerador jwtGenerador) {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
@@ -44,41 +44,182 @@ public class RestControllerAuth {
     }
 
     @PostMapping("register")
-    public ResponseEntity<String> registrar(@RequestBody DtoRegistro dtoRegistro) {
+    public ResponseEntity<?> registrar(@RequestBody DtoRegistro dtoRegistro) {
+        // Validar que el usuario no exista
         if (usuariosRepository.existsByUsername(dtoRegistro.getUsername())) {
-            return new ResponseEntity<>("el usuario ya existe, intenta con otro", HttpStatus.BAD_REQUEST);
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "El usuario ya existe, intenta con otro");
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
-        Usuarios usuarios = new Usuarios();
-        usuarios.setUsername(dtoRegistro.getUsername());
-        usuarios.setPassword(passwordEncoder.encode(dtoRegistro.getPassword()));
-        Roles roles = rolesRepository.findByName("USER").get();
-        usuarios.setRoles(Collections.singletonList(roles));
-        usuariosRepository.save(usuarios);
-        return new ResponseEntity<>("Registro de usuario exitoso", HttpStatus.OK);
+
+        // Validar que el email no exista (si quieres que sea único)
+        if (dtoRegistro.getEmail() != null && !dtoRegistro.getEmail().isEmpty()) {
+            // Podrías agregar un método existsByEmail en el repositorio si quieres validar unicidad
+        }
+
+        // Crear nuevo usuario
+        Usuarios usuario = new Usuarios();
+        usuario.setUsername(dtoRegistro.getUsername());
+        usuario.setPassword(passwordEncoder.encode(dtoRegistro.getPassword()));
+        usuario.setEmail(dtoRegistro.getEmail());
+        usuario.setNombre(dtoRegistro.getNombre());
+
+        // Asignar rol por defecto (USER)
+        Roles rol = rolesRepository.findByName("USER")
+                .orElseThrow(() -> new RuntimeException("Rol USER no encontrado en la base de datos"));
+        usuario.setRoles(Collections.singletonList(rol));
+
+        usuariosRepository.save(usuario);
+
+        Map<String, String> successResponse = new HashMap<>();
+        successResponse.put("mensaje", "Registro de usuario exitoso");
+        successResponse.put("username", usuario.getUsername());
+        successResponse.put("email", usuario.getEmail());
+        successResponse.put("nombre", usuario.getNombre());
+
+        return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
     }
 
     @PostMapping("registerAdm")
-    public ResponseEntity<String> registrarAdmin(@RequestBody DtoRegistro dtoRegistro) {
+    public ResponseEntity<?> registrarAdmin(@RequestBody DtoRegistro dtoRegistro) {
+        // Validar que el usuario no exista
         if (usuariosRepository.existsByUsername(dtoRegistro.getUsername())) {
-            return new ResponseEntity<>("el usuario ya existe, intenta con otro", HttpStatus.BAD_REQUEST);
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "El usuario ya existe, intenta con otro");
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
-        Usuarios usuarios = new Usuarios();
-        usuarios.setUsername(dtoRegistro.getUsername());
-        usuarios.setPassword(passwordEncoder.encode(dtoRegistro.getPassword()));
-        Roles roles = rolesRepository.findByName("ADMIN").get();
-        usuarios.setRoles(Collections.singletonList(roles));
-        usuariosRepository.save(usuarios);
-        return new ResponseEntity<>("Registro de admin exitoso", HttpStatus.OK);
+
+        // Crear nuevo administrador
+        Usuarios usuario = new Usuarios();
+        usuario.setUsername(dtoRegistro.getUsername());
+        usuario.setPassword(passwordEncoder.encode(dtoRegistro.getPassword()));
+        usuario.setEmail(dtoRegistro.getEmail());
+        usuario.setNombre(dtoRegistro.getNombre());
+
+        // Asignar rol ADMIN
+        Roles rol = rolesRepository.findByName("ADMIN")
+                .orElseThrow(() -> new RuntimeException("Rol ADMIN no encontrado en la base de datos"));
+        usuario.setRoles(Collections.singletonList(rol));
+
+        usuariosRepository.save(usuario);
+
+        Map<String, String> successResponse = new HashMap<>();
+        successResponse.put("mensaje", "Registro de administrador exitoso");
+        successResponse.put("username", usuario.getUsername());
+        successResponse.put("email", usuario.getEmail());
+        successResponse.put("nombre", usuario.getNombre());
+
+        return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
     }
 
-    //Método para poder loguear un usuario y obtener un token
+    @PostMapping("registerGuest")
+    public ResponseEntity<?> registrarGuest(@RequestBody DtoRegistro dtoRegistro) {
+        // Validar que el usuario no exista
+        if (usuariosRepository.existsByUsername(dtoRegistro.getUsername())) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "El usuario ya existe, intenta con otro");
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+
+        // Crear nuevo guest
+        Usuarios usuario = new Usuarios();
+        usuario.setUsername(dtoRegistro.getUsername());
+        usuario.setPassword(passwordEncoder.encode(dtoRegistro.getPassword()));
+        usuario.setEmail(dtoRegistro.getEmail());
+        usuario.setNombre(dtoRegistro.getNombre());
+
+        // Asignar rol GUEST
+        Roles rol = rolesRepository.findByName("GUEST")
+                .orElseThrow(() -> new RuntimeException("Rol GUEST no encontrado en la base de datos"));
+        usuario.setRoles(Collections.singletonList(rol));
+
+        usuariosRepository.save(usuario);
+
+        Map<String, String> successResponse = new HashMap<>();
+        successResponse.put("mensaje", "Registro de guest exitoso");
+        successResponse.put("username", usuario.getUsername());
+        successResponse.put("email", usuario.getEmail());
+        successResponse.put("nombre", usuario.getNombre());
+
+        return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
+    }
+
+    // Método para actualizar información del usuario (opcional)
+    @PutMapping("actualizar-usuario")
+    public ResponseEntity<?> actualizarUsuario(@RequestBody DtoRegistro dtoRegistro, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Usuarios usuario = usuariosRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Actualizar campos si se proporcionan
+        if (dtoRegistro.getEmail() != null && !dtoRegistro.getEmail().isEmpty()) {
+            usuario.setEmail(dtoRegistro.getEmail());
+        }
+
+        if (dtoRegistro.getNombre() != null && !dtoRegistro.getNombre().isEmpty()) {
+            usuario.setNombre(dtoRegistro.getNombre());
+        }
+
+        // Si se proporciona nueva contraseña
+        if (dtoRegistro.getPassword() != null && !dtoRegistro.getPassword().isEmpty()) {
+            usuario.setPassword(passwordEncoder.encode(dtoRegistro.getPassword()));
+        }
+
+        usuariosRepository.save(usuario);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("mensaje", "Usuario actualizado exitosamente");
+        response.put("username", usuario.getUsername());
+        response.put("email", usuario.getEmail());
+        response.put("nombre", usuario.getNombre());
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Método para poder loguear un usuario y obtener un token
     @PostMapping("login")
     public ResponseEntity<DtoAuthRespuesta> login(@RequestBody DtoLogin dtoLogin) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 dtoLogin.getUsername(), dtoLogin.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerador.generarToken(authentication);
-        return new ResponseEntity<>(new DtoAuthRespuesta(token), HttpStatus.OK);
+        Usuarios usuario = usuariosRepository.findByUsername(dtoLogin.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        String role = usuario.getRoles().get(0).getName();
+        return new ResponseEntity<>(new DtoAuthRespuesta(token, role), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "info-usuario", headers = "Accept=application/json")
+    public ResponseEntity<?> obtenerInfoUsuario(Authentication authentication) {
+
+        System.out.println("=== INFO-USUARIO ENDPOINT CALLED ===");
+        System.out.println("Authentication: " + authentication);
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            System.out.println("Usuario NO autenticado");
+            return ResponseEntity.status(401).build();
+        }
+        Usuarios usuario = usuariosRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        System.out.println("Usuario autenticado: " + authentication.getName());
+
+        // Crear respuesta
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("autenticado", true);
+        respuesta.put("username", authentication.getName());
+        respuesta.put("userId", usuario.getIdUsuario());
+        respuesta.put("email", usuario.getEmail());
+        respuesta.put("nombre", usuario.getNombre());
+        respuesta.put("roles", authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+
+        System.out.println("Respuesta: " + respuesta);
+
+        return ResponseEntity.ok(respuesta);
     }
 
 }

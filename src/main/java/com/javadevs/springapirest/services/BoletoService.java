@@ -2,7 +2,10 @@ package com.javadevs.springapirest.services;
 
 import com.javadevs.springapirest.models.Boletos;
 import com.javadevs.springapirest.models.Sesiones;
+import com.javadevs.springapirest.models.Usuarios;
+import com.javadevs.springapirest.dtos.BoletoRequestDTO;
 import com.javadevs.springapirest.repositories.IBoletoRepository;
+import com.javadevs.springapirest.repositories.IUsuariosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +21,38 @@ public class BoletoService {
 
     private  IBoletoRepository boletoRepository;
     private  SesionService sesionService;
+    private final IUsuariosRepository usuariosRepository;
 
     @Autowired
-    public BoletoService(IBoletoRepository boletoRepository, SesionService sesionService) {
+    public BoletoService(IBoletoRepository boletoRepository, SesionService sesionService,IUsuariosRepository usuariosRepository) {
         this.boletoRepository = boletoRepository;
         this.sesionService = sesionService;
+        this.usuariosRepository = usuariosRepository;
+    }
+    @Transactional
+    public Boletos crearDesdeDTO(BoletoRequestDTO dto) throws Exception {
+        Boletos boleto = new Boletos();
+
+        // Asignar usuario si viene en el DTO
+        if (dto.getUsuarioId() != null) {
+            Usuarios usuario = usuariosRepository.findById(dto.getUsuarioId())
+                    .orElseThrow(() -> new Exception("Usuario no encontrado con ID: " + dto.getUsuarioId()));
+            boleto.setUsuario(usuario);
+        }
+        // Si no viene usuarioId, boleto.getUsuario() será null (boleto sin usuario)
+
+        // Obtener y asignar sesión
+        Sesiones sesion = sesionService.readOne(dto.getSesionId())
+                .orElseThrow(() -> new Exception("Sesión no encontrada con ID: " + dto.getSesionId()));
+        boleto.setSesion(sesion);
+
+        boleto.setNumeroAsiento(dto.getNumeroAsiento());
+        boleto.setPrecioPagado(dto.getPrecioPagado());
+        boleto.setTipoEntrada(dto.getTipoEntrada());
+        boleto.setFechaCompra(LocalDateTime.now());
+        boleto.setEstado("RESERVADO"); // Estado inicial
+
+        return crear(boleto);
     }
 
     // Crear boleto con validaciones
@@ -30,6 +60,20 @@ public class BoletoService {
     public Boletos crear(Boletos boleto) throws Exception {
         // Validaciones básicas
         validarBoleto(boleto);
+
+        // IMPORTANTE: Buscar y asignar usuario si viene con ID
+        if (boleto.getUsuario() != null && boleto.getUsuario().getIdUsuario() != null) {
+            Long usuarioId = boleto.getUsuario().getIdUsuario();
+            Usuarios usuario = usuariosRepository.findById(usuarioId)
+                    .orElseThrow(() -> new Exception("Usuario no encontrado con ID: " + usuarioId));
+            boleto.setUsuario(usuario);
+        } else if (boleto.getUsuario() == null && boleto.getUsuarioId() != null) {
+            // Si viene un usuarioId separado (como en el DTO)
+            Usuarios usuario = usuariosRepository.findById(boleto.getUsuarioId())
+                    .orElseThrow(() -> new Exception("Usuario no encontrado con ID: " + boleto.getUsuarioId()));
+            boleto.setUsuario(usuario);
+        }
+        // Si no hay usuario, se deja como null (venta en taquilla)
 
         // Verificar que la sesión existe y cargarla completa
         if (boleto.getSesion() == null || boleto.getSesion().getIdsesion() == null) {
@@ -75,6 +119,8 @@ public class BoletoService {
 
         return boletoRepository.save(boleto);
     }
+
+
 
     // Obtener todos los boletos
     public List<Boletos> readAll() {
@@ -170,7 +216,9 @@ public class BoletoService {
 
     }
 
-
+    public List<Boletos> findByUsuarioId(Long usuarioId) {
+        return boletoRepository.findByUsuarioId(usuarioId);
+    }
 
 
 

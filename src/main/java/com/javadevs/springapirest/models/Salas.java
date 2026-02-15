@@ -18,11 +18,13 @@ public class Salas {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_salas")
+    @Column(name = "id_sala")
     private Long idsala;
     private long numeroSala;
     private long capacidad;
-    private String tipoSala;   //normal, VIP, 4DX
+    private long fila;
+    private long columna;
+    private String tipoSala;
     private Boolean estado;
 
 

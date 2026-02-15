@@ -5,6 +5,7 @@ import com.javadevs.springapirest.repositories.IPeliculaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,11 @@ public class PeliculaService {
     //Obtenemos toda una lista de pelicula
     public List<Peliculas> readAll() {
         return peliculaRepo.findAll();
+    }
+
+    public List<Peliculas> readAllConSesionesFuturas() {
+        LocalDate fechaActual = LocalDate.now();
+        return peliculaRepo.findPeliculasConSesionesFuturas(fechaActual);
     }
 
     //Obtenemos un pelicula por su id

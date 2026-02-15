@@ -3,53 +3,93 @@ package com.javadevs.springapirest.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.util.Date;
-
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtGenerador {
 
-    //Método para crear un token por medio de la authentication
-    public String generarToken(Authentication authentication) {
+    // Clave segura generada automáticamente
+    private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
-        String username = authentication.getName();
+    // Método para crear un token por medio de la authentication
+    public String generarToken(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        // Obtener roles del usuario
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        // Tomar el primer rol (o adaptar según tu lógica)
+        String role = roles.isEmpty() ? "USER" : roles.get(0);
+
         Date tiempoActual = new Date();
         Date expiracionToken = new Date(tiempoActual.getTime() + ConstantesSeguridad.JWT_EXPIRATION_TOKEN);
 
-        //Linea para generar el token
-        String token = Jwts.builder() //Construimos un token JWT llamado token
-                .setSubject(username) //Aca establecemos el nombre de usuario que está iniciando sesión
-                .setIssuedAt(new Date()) //Establecemos la fecha de emisión del token en el momento actual
-                .setExpiration(expiracionToken) //Establecemos la fecha de caducidad del token
-                .signWith(SignatureAlgorithm.HS512, ConstantesSeguridad.JWT_FIRMA) /*Utilizamos este método para firmar
-                nuestro token y de esta manera evitar la manipulación o modificación de este*/
-                .compact(); //Este método finaliza la construcción del token y lo convierte en una cadena compacta
-        return token;
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .claim("role", role)
+                .setIssuedAt(new Date())
+                .setExpiration(expiracionToken)
+                .signWith(secretKey, SignatureAlgorithm.HS512) // Usar la clave segura
+                .compact();
     }
 
-    //Método para extraer un Username apartir de un token
+    // Método para extraer un Username a partir de un token
     public String obtenerUsernameDeJwt(String token) {
-        Claims claims = Jwts.parser() // El método parser se utiliza con el fin de analizar el token
-                .setSigningKey(ConstantesSeguridad.JWT_FIRMA)// Establece la clave de firma, que se utiliza para verificar la firma del token
-                .parseClaimsJws(token) //Se utiliza para verificar la firma del token, apartir del String "token"
-                .getBody(); /*Obtenemos el claims(cuerpo) ya verificado del token el cual contendrá la información de
-                nombre de usuario, fecha de expiración y firma del token*/
-        return claims.getSubject(); //Devolvemos el nombre de usuario
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
     }
 
-    //Método para validar el token
+    // Método para validar el token
     public Boolean validarToken(String token) {
         try {
-            //Validación del token por medio de la firma que contiene el String token(token)
-            //Si son idénticas validara el token o caso contrario saltara la excepción de abajo
-            Jwts.parser().setSigningKey(ConstantesSeguridad.JWT_FIRMA).parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
-            throw new AuthenticationCredentialsNotFoundException("Jwt ah expirado o esta incorrecto");
+            throw new AuthenticationCredentialsNotFoundException("Jwt ha expirado o esta incorrecto");
+        }
+    }
+
+    // Método para obtener todos los claims del token
+    public Claims obtenerClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    // Método para obtener un claim específico
+    public String obtenerClaim(String token, String claimName) {
+        Claims claims = obtenerClaims(token);
+        return claims.get(claimName, String.class);
+    }
+
+    // Método para verificar si el token contiene un claim específico
+    public boolean tieneClaim(String token, String claimName) {
+        try {
+            Claims claims = obtenerClaims(token);
+            return claims.get(claimName) != null;
+        } catch (Exception e) {
+            return false;
         }
     }
 }

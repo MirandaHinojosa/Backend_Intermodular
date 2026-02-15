@@ -12,15 +12,19 @@ import java.util.List;
 @Repository
 public interface IBoletoRepository extends JpaRepository<Boletos, Long>{
 
-
-    //boletos por sesión
+    // Boletos por sesión
     @Query("SELECT b FROM Boletos b WHERE b.sesion.idsesion = :sesion_Id")
     List<Boletos> findBySesionId(@Param("sesion_Id") Long sesionId);
 
+    // Boletos por usuario
+    @Query("SELECT b FROM Boletos b WHERE b.usuario.idUsuario = :usuarioId")
+    List<Boletos> findByUsuarioId(@Param("usuarioId") Long usuarioId);
 
-    //boletos por estado
+
+
+
+    // Boletos por estado
     List<Boletos> findByEstado(String estado);
-
 
     // Asientos ocupados en una sesión
     @Query("SELECT b.numeroAsiento FROM Boletos b WHERE b.sesion.idsesion = :sesionId AND b.estado IN ('RESERVADO', 'PAGADO')")
@@ -30,9 +34,12 @@ public interface IBoletoRepository extends JpaRepository<Boletos, Long>{
     @Query("SELECT b FROM Boletos b WHERE DATE(b.fechaCompra) = :fecha")
     List<Boletos> findByFecha(@Param("fecha") LocalDate fecha);
 
-
-    //verificar si un asiento esta ocupado
+    // Verificar si un asiento está ocupado
     @Query("SELECT COUNT(b) > 0 FROM Boletos b WHERE b.sesion.idsesion = :sesionId " +
             "AND b.numeroAsiento = :numeroAsiento AND b.estado IN ('RESERVADO', 'PAGADO')")
     boolean isAsientoOcupado(@Param("sesionId") Long sesionId, @Param("numeroAsiento") String numeroAsiento);
+
+
+
+
 }
