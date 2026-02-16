@@ -38,7 +38,7 @@ public class SalaService {
         salaRepo.save(sala);
     }
 
-    //eliminamos un sala
+    //eliminamos un sala, implementado al ginal
     public void delete(Long id) {
         salaRepo.deleteById(id);
     }
