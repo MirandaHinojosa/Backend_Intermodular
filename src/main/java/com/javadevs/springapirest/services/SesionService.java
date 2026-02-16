@@ -48,7 +48,6 @@ public class SesionService {
     public void delete(Long id) {
         sesionesRepo.deleteById(id);
     }
-
     // Obtenemos sesiones por película
     public List<Sesiones> findByPeliculaId(Long peliculaId) {
         return sesionesRepo.findByPeliculaId(peliculaId);
