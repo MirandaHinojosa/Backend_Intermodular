@@ -52,9 +52,8 @@ public class RestControllerAuth {
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
 
-        // Validar que el email no exista (si quieres que sea único)
         if (dtoRegistro.getEmail() != null && !dtoRegistro.getEmail().isEmpty()) {
-            // Podrías agregar un método existsByEmail en el repositorio si quieres validar unicidad
+
         }
 
         // Crear nuevo usuario
@@ -144,7 +143,7 @@ public class RestControllerAuth {
         return new ResponseEntity<>(successResponse, HttpStatus.CREATED);
     }
 
-    // Método para actualizar información del usuario (opcional)
+      //no implementado,
     @PutMapping("actualizar-usuario")
     public ResponseEntity<?> actualizarUsuario(@RequestBody DtoRegistro dtoRegistro, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

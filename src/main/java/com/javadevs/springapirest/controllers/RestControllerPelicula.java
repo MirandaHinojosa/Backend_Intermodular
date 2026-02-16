@@ -50,8 +50,6 @@ public class RestControllerPelicula {
         return peliService.readOne(id);
     }
 
-
-
     //Petición para actualizar un pelicula
     @PutMapping(value = "actualizar", headers = "Accept=application/json")
     public void actualizarPelicula(@RequestBody Peliculas pelicula) {

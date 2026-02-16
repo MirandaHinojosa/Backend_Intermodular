@@ -24,11 +24,11 @@ public class ChatService {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    // Mapa para rastrear conversaciones activas
+    //Mapa para rastrear conversaciones activas
     private Map<String, String> conversacionesActivas = new ConcurrentHashMap<>();
-    // Mapa para contar mensajes por usuario
+    //Mapa para contar mensajes por usuario
     private Map<String, Integer> contadorMensajes = new ConcurrentHashMap<>();
-    // Mapa para almacenar historial de mensajes
+    //Mapa para almacenar historial de mensajes
     private Map<String, List<Map<String, Object>>> historialMensajes = new ConcurrentHashMap<>();
 
     private static final String ADMIN_EMAIL = "admin@nice.com";
@@ -38,7 +38,6 @@ public class ChatService {
         Map<String, Object> respuesta = validarYPrepararUsuario(mensajeDTO);
         String senderEmail = mensajeDTO.getSenderEmail();
 
-        // Marcar que este usuario tiene una conversación activa
         conversacionesActivas.put(senderEmail, "ACTIVO");
         contadorMensajes.put(senderEmail, 1); // Primer mensaje
 
@@ -56,7 +55,7 @@ public class ChatService {
         // Enviar respuesta automática del ADMIN (ASÍNCRONO para no bloquear)
         enviarRespuestaAutomaticaAsync(senderEmail);
 
-        // Preparar respuesta
+        //Preparar respuesta
         respuesta.put("estado", "success");
         respuesta.put("tipo", "CHAT_INICIADO");
         respuesta.put("mensaje", "Chat iniciado exitosamente");
@@ -66,7 +65,7 @@ public class ChatService {
         return respuesta;
     }
 
-    // Método para ENVIAR mensaje en conversación existente
+    //Método para ENVIAR mensaje en conversación existente
     public Map<String, Object> enviarMensaje(ChatMensajeDTO mensajeDTO) {
         Map<String, Object> respuesta = validarYPrepararUsuario(mensajeDTO);
         String senderEmail = mensajeDTO.getSenderEmail();
@@ -87,7 +86,7 @@ public class ChatService {
         // Guardar mensaje en historial
         guardarMensajeEnHistorial(senderEmail, mensajeDTO, false);
 
-        // Preparar respuesta
+        //Preparar respuesta
         respuesta.put("estado", "success");
         respuesta.put("tipo", "MENSAJE_ENVIADO");
         respuesta.put("mensaje", "Mensaje enviado exitosamente");
@@ -97,7 +96,7 @@ public class ChatService {
         return respuesta;
     }
 
-    // Método común para validar usuario
+    //Método común para validar usuario
     private Map<String, Object> validarYPrepararUsuario(ChatMensajeDTO mensajeDTO) {
         Map<String, Object> resultado = new HashMap<>();
 
@@ -107,7 +106,7 @@ public class ChatService {
         Usuarios usuario = usuariosRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Verificar que el usuario tenga rol USER
+        //Verificar que el usuario tenga rol USER
         boolean esUser = usuario.getRoles().stream()
                 .anyMatch(rol -> rol.getName().equals("USER"));
 
@@ -115,7 +114,7 @@ public class ChatService {
             throw new RuntimeException("Solo usuarios con rol USER pueden usar el chat");
         }
 
-        // Verificar que el correo coincida o asignarlo
+        //verificar que el correo coincida o asignarlo
         if (mensajeDTO.getSenderEmail() == null || !usuario.getEmail().equals(mensajeDTO.getSenderEmail())) {
             mensajeDTO.setSenderEmail(usuario.getEmail());
         }
@@ -139,7 +138,6 @@ public class ChatService {
                 mensajeWebSocket
         );
 
-        // ENVIAR TAMBIÉN AL TOPIC DEL ADMIN
         messagingTemplate.convertAndSend(
                 "/topic/admin/chat",
                 mensajeWebSocket
@@ -167,7 +165,7 @@ public class ChatService {
                             respuestaAutomatica
                     );
 
-                    // Guardar en historial
+                    //Guardar en historial
                     ChatMensajeDTO mensajeAuto = new ChatMensajeDTO();
                     mensajeAuto.setSenderEmail(ADMIN_EMAIL);
                     mensajeAuto.setReceiverEmail(senderEmail);
@@ -194,13 +192,13 @@ public class ChatService {
         respuestaAdmin.put("tipo", "RESPUESTA_ADMIN");
         respuestaAdmin.put("id", System.currentTimeMillis());
 
-        // Enviar al usuario
+        //Enviar al usuario
         messagingTemplate.convertAndSend(
                 "/topic/chat/" + receiverEmail,
                 respuestaAdmin
         );
 
-        // Enviar también al topic del admin para que todos los admins vean la respuesta
+        //Enviar también al topic del admin para que todos los admins vean la respuesta
         messagingTemplate.convertAndSend(
                 "/topic/admin/chat",
                 respuestaAdmin
@@ -215,7 +213,7 @@ public class ChatService {
         guardarMensajeEnHistorial(receiverEmail, mensajeAdmin, false);
     }
 
-    // Método para cerrar conversación
+    //Método para cerrar conversación
     public Map<String, Object> cerrarChat(String emailUsuario) {
         conversacionesActivas.remove(emailUsuario);
         contadorMensajes.remove(emailUsuario);
@@ -229,7 +227,7 @@ public class ChatService {
         return respuesta;
     }
 
-    // Método para ver estado del chat (MEJORADO)
+    //Método para ver estado del chat
     public Map<String, Object> estadoChat(String emailUsuario) {
         Map<String, Object> estado = new HashMap<>();
         estado.put("email", emailUsuario);
@@ -256,7 +254,7 @@ public class ChatService {
         return historialMensajes.getOrDefault(emailUsuario, new ArrayList<>());
     }
 
-    // CAMBIADO: De privado a público para que pueda ser usado por AdminChatController
+
     public void guardarMensajeEnHistorial(String emailUsuario, ChatMensajeDTO mensaje, boolean esAutomatico) {
         if (!historialMensajes.containsKey(emailUsuario)) {
             historialMensajes.put(emailUsuario, new ArrayList<>());

@@ -26,7 +26,6 @@ public class AsientoService {
             throw new RuntimeException("La sala es obligatoria para crear un asiento");
         }
 
-        // CORREGIDO: Usa el método correcto del repositorio
         boolean existe = asientoRepository.existsByNumeroAsientoAndSalaId(
                 asiento.getNumeroAsiento(),
                 asiento.getSala().getIdsala()  // getIdsala() está bien

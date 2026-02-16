@@ -71,7 +71,7 @@ public class ChatController {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String username = auth.getName();
 
-            // CONVERTIR username a email
+
             String email = chatService.obtenerEmailPorUsername(username);
 
             Map<String, Object> respuesta = chatService.estadoChat(email);
@@ -100,8 +100,6 @@ public class ChatController {
         }
     }
 
-
-    // AGREGAR a ChatController.java
     @GetMapping("/historial")
     public ResponseEntity<?> obtenerHistorial() {
         try {

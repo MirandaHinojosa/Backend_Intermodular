@@ -75,7 +75,7 @@ public class RestControllerSesion {
     //   return sesionService.findSesionesDisponibles();
     //}
 
-    // Petición para obtener sesiones por fecha y película
+    // Petición para obtener sesiones por fecha y película, no implementado
     @GetMapping(value = "fecha/{fecha}/pelicula/{peliculaId}", headers = "Accept=application/json")
     public List<Sesiones> obtenerSesionesPorFechaYPelicula(
             @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fecha,

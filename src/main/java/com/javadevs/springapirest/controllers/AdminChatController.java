@@ -45,7 +45,7 @@ public class AdminChatController {
             return ResponseEntity.badRequest().body(error);
         }
     }
-    // NUEVO ENDPOINT: Obtener usuarios con conversaciones activas
+    //Obtener usuarios con conversaciones activas
     @GetMapping("/usuarios-activos")
     public ResponseEntity<?> obtenerUsuariosActivos() {
         try {
@@ -65,7 +65,7 @@ public class AdminChatController {
         }
     }
 
-    // NUEVO ENDPOINT: Obtener historial de chat de un usuario específico (para admin)
+    //Obtener historial de chat de un usuario específico (para admin)
     @GetMapping("/historial/{emailUsuario}")
     public ResponseEntity<?> obtenerHistorialUsuario(@PathVariable String emailUsuario) {
         try {
@@ -85,7 +85,7 @@ public class AdminChatController {
         }
     }
 
-    // NUEVO ENDPOINT: Cerrar chat de un usuario (admin puede forzar cierre)
+    //Cerrar chat de un usuario (admin puede forzar cierre)
     @PostMapping("/cerrar/{emailUsuario}")
     public ResponseEntity<?> cerrarChatUsuario(@PathVariable String emailUsuario) {
         try {

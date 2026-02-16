@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class BoletoRequestDTO {
     private Long sesionId;
-    private Long usuarioId; // OPCIONAL - puede ser null
+    private Long usuarioId;
     private String numeroAsiento;
     private BigDecimal precioPagado;
     private String tipoEntrada;
-    // fechaCompra se genera automáticamente
+
 }

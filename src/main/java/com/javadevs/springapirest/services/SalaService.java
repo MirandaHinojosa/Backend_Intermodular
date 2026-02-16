@@ -18,27 +18,27 @@ public class SalaService {
         this.salaRepo = salaRepo;
     }
 
-    //Creamos un sala
+    //creamos un sala
     public void crear(Salas sala) {
         salaRepo.save(sala);
     }
 
-    //Obtenemos toda una lista de sala
+    //obtenemos toda una lista de sala
     public List<Salas> readAll() {
         return salaRepo.findAll();
     }
 
-    //Obtenemos un sala por su id
+    //obtenemos un sala por su id
     public Optional<Salas> readOne(Long id) {
         return salaRepo.findById(id);
     }
 
-    //Actualizamos un sala
+    //actualizamos un sala
     public void update(Salas sala) {
         salaRepo.save(sala);
     }
 
-    //Eliminamos un sala
+    //eliminamos un sala
     public void delete(Long id) {
         salaRepo.deleteById(id);
     }

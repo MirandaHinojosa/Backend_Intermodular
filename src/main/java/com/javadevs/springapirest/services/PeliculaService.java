@@ -19,12 +19,12 @@ public class PeliculaService {
         this.peliculaRepo = peliculaRepo;
     }
 
-    //Creamos un pelicula
+    //creamos un pelicula
     public void crear(Peliculas pelicula) {
         peliculaRepo.save(pelicula);
     }
 
-    //Obtenemos toda una lista de pelicula
+    //obtenemos toda una lista de pelicula
     public List<Peliculas> readAll() {
         return peliculaRepo.findAll();
     }
@@ -34,17 +34,17 @@ public class PeliculaService {
         return peliculaRepo.findPeliculasConSesionesFuturas(fechaActual);
     }
 
-    //Obtenemos un pelicula por su id
+    //obtenemos un pelicula por su id
     public Optional<Peliculas> readOne(Long id) {
         return peliculaRepo.findById(id);
     }
 
-    //Actualizamos un pelicula
+    //actualizamos un pelicula
     public void update(Peliculas pelicula) {
         peliculaRepo.save(pelicula);
     }
 
-    //Eliminamos un pelicula
+    //eliminamos un pelicula
     public void delete(Long id) {
         peliculaRepo.deleteById(id);
     }

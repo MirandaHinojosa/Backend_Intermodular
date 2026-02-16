@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-//Decimos que la clase es una entidad
+
 @Entity
 @Table(name = "role")
 

@@ -20,7 +20,7 @@ public class RestControllerAsiento {
         this.asientoService = asientoService;
     }
 
-    // Petición para crear un asiento
+    //Petición para crear un asiento
     @PostMapping(value = "crear", headers = "Accept=application/json")
     public ResponseEntity<Asiento> crearAsiento(@RequestBody Asiento asiento) {
         try {
@@ -36,7 +36,7 @@ public class RestControllerAsiento {
         return asientoService.readAll();
     }
 
-    // Petición para obtener asiento mediante "ID"
+    //Petición para obtener asiento mediante "ID"
     @GetMapping(value = "listarId/{id}", headers = "Accept=application/json")
     public ResponseEntity<Asiento> obtenerAsientoPorId(@PathVariable Long id) {
         Optional<Asiento> asiento = asientoService.readOne(id);
@@ -50,13 +50,13 @@ public class RestControllerAsiento {
         return asientoService.findBySala(idSala);
     }
 
-    // Petición para obtener asientos disponibles por sala
+    //Petición para obtener asientos disponibles por sala
     @GetMapping(value = "disponibles/{idSala}", headers = "Accept=application/json")
     public List<Asiento> obtenerAsientosDisponibles(@PathVariable Long idSala) {
         return asientoService.findDisponiblesBySala(idSala);
     }
 
-    // Petición para actualizar un asiento
+    //Petición para actualizar un asiento
     @PutMapping(value = "actualizar", headers = "Accept=application/json")
     public ResponseEntity<Asiento> actualizarAsiento(@RequestBody Asiento asiento) {
         try {
@@ -67,7 +67,7 @@ public class RestControllerAsiento {
         }
     }
 
-    // Petición para eliminar un asiento por "Id"
+    //Petición para eliminar un asiento por "Id"
     @DeleteMapping(value = "eliminar/{id}", headers = "Accept=application/json")
     public ResponseEntity<Void> eliminarAsiento(@PathVariable Long id) {
         try {

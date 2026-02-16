@@ -39,9 +39,9 @@ public class BoletoService {
                     .orElseThrow(() -> new Exception("Usuario no encontrado con ID: " + dto.getUsuarioId()));
             boleto.setUsuario(usuario);
         }
-        // Si no viene usuarioId, boleto.getUsuario() será null (boleto sin usuario)
+        //Si no viene usuarioId, boleto.getUsuario() será null (boleto sin usuario)
 
-        // Obtener y asignar sesión
+        //Obtener y asignar sesión
         Sesiones sesion = sesionService.readOne(dto.getSesionId())
                 .orElseThrow(() -> new Exception("Sesión no encontrada con ID: " + dto.getSesionId()));
         boleto.setSesion(sesion);
@@ -55,13 +55,13 @@ public class BoletoService {
         return crear(boleto);
     }
 
-    // Crear boleto con validaciones
+    //Crear boleto con validaciones
     @Transactional
     public Boletos crear(Boletos boleto) throws Exception {
         // Validaciones básicas
         validarBoleto(boleto);
 
-        // IMPORTANTE: Buscar y asignar usuario si viene con ID
+        //Buscar y asignar usuario si viene con ID
         if (boleto.getUsuario() != null && boleto.getUsuario().getIdUsuario() != null) {
             Long usuarioId = boleto.getUsuario().getIdUsuario();
             Usuarios usuario = usuariosRepository.findById(usuarioId)
@@ -93,7 +93,7 @@ public class BoletoService {
             throw new Exception("El asiento " + boleto.getNumeroAsiento() + " ya está ocupado");
         }
 
-        // Validar asientos disponibles
+        //Validar asientos disponibles
         if (sesion.getAsientosDisponibles() == null) {
             throw new Exception("El valor de asientos disponibles es nulo");
         }
@@ -102,17 +102,17 @@ public class BoletoService {
             throw new Exception("No hay asientos disponibles para esta sesión");
         }
 
-        // Validar fecha de la sesión
+        //Validar fecha de la sesión
         LocalDateTime ahora = LocalDateTime.now();
         LocalDateTime fechaSesion = LocalDateTime.of(sesion.getFecha(), sesion.getHora());
         if (fechaSesion.isBefore(ahora)) {
             throw new Exception("La sesión ya ha comenzado o ha pasado");
         }
 
-        // Reducir asientos disponibles
+        //Reducir asientos disponibles
         sesion.setAsientosDisponibles(sesion.getAsientosDisponibles() - 1);
 
-        // Si no hay fecha de compra, usar la fecha actual
+        //Si no hay fecha de compra, usar la fecha actual
         if (boleto.getFechaCompra() == null) {
             boleto.setFechaCompra(LocalDateTime.now());
         }
@@ -139,7 +139,7 @@ public class BoletoService {
         return boletoRepository.save(boleto);
     }
 
-    // Eliminar boleto
+    // Eliminar boleto, no se implementa
     @Transactional
     public void delete(Long id) throws Exception {
         Optional<Boletos> boletoOpt = boletoRepository.findById(id);
@@ -158,7 +158,7 @@ public class BoletoService {
         }
     }
 
-    // Cancelar boleto (cambio de estado)
+    // Cancelar boleto (cambio de estado), no se implementa
     @Transactional
     public void cancelarBoleto(Long id) throws Exception {
         Optional<Boletos> boletoOpt = boletoRepository.findById(id);
@@ -201,7 +201,7 @@ public class BoletoService {
         return boletoRepository.findAsientosOcupadosBySesionId(sesionId);
     }
 
-    // Métodos auxiliares privados
+    // Métodos auxiliares privados, no se implementa
     private void validarBoleto(Boletos boleto) throws Exception {
         if (boleto.getSesion() == null) {
             throw new Exception("La sesión es requerida");

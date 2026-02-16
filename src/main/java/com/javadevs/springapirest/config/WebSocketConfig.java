@@ -29,12 +29,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-chat")
                 .setAllowedOriginPatterns("*")
-                .addInterceptors(customHandshakeInterceptor) // Usa la instancia inyectada
+                .addInterceptors(customHandshakeInterceptor)
                 .withSockJS();
 
         registry.addEndpoint("/ws-chat")
                 .setAllowedOriginPatterns("*")
-                .addInterceptors(customHandshakeInterceptor); // Usa la instancia inyectada
+                .addInterceptors(customHandshakeInterceptor);
     }
 
     @Override

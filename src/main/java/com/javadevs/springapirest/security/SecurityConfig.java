@@ -49,6 +49,7 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
+                //todas las posibles URLS
                 "http://localhost:5500",
                 "http://127.0.0.1:5500",
                 "http://localhost:8080",
@@ -88,14 +89,14 @@ public class SecurityConfig {
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
-        // IMPORTANTE: Esto es necesario para WebSocket
+        //IMPORTANTE:Esto es necesario para WebSocket
         configuration.addAllowedOriginPattern("*");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
+    //muchos endpoints no usado, pero se ponen para que se puedan implementar.
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

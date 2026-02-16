@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 @Component
 public class JwtGenerador {
 
-    // Clave segura generada automáticamente
+    //Clave segura generada automáticamente
     private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
-    // Método para crear un token por medio de la authentication
+    //Método para crear un token por medio de la authentication
     public String generarToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
@@ -30,7 +30,7 @@ public class JwtGenerador {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        // Tomar el primer rol (o adaptar según tu lógica)
+        // Tomar el primer rol
         String role = roles.isEmpty() ? "USER" : roles.get(0);
 
         Date tiempoActual = new Date();
@@ -68,7 +68,7 @@ public class JwtGenerador {
         }
     }
 
-    // Método para obtener todos los claims del token
+    //Método para obtener todos los claims del token
     public Claims obtenerClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
@@ -77,13 +77,13 @@ public class JwtGenerador {
                 .getBody();
     }
 
-    // Método para obtener un claim específico
+    //Método para obtener un claim específico
     public String obtenerClaim(String token, String claimName) {
         Claims claims = obtenerClaims(token);
         return claims.get(claimName, String.class);
     }
 
-    // Método para verificar si el token contiene un claim específico
+    //Método para verificar si el token contiene un claim específico
     public boolean tieneClaim(String token, String claimName) {
         try {
             Claims claims = obtenerClaims(token);

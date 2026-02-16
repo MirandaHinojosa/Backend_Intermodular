@@ -57,7 +57,7 @@ public class RestControllerBoleto {
             String username = authentication.getName();
             logger.info("Usuario autenticado: {}", username);
 
-            // Buscar usuario por username
+            //Buscar usuario por username
             Optional<Usuarios> usuarioOpt = usuariosRepository.findByUsername(username);
             if (!usuarioOpt.isPresent()) {
                 return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
@@ -99,7 +99,7 @@ public class RestControllerBoleto {
         }
     }
 
-    // Eliminar boleto
+    // Eliminar boleto, no impñementado
     @DeleteMapping(value = "eliminar/{id}", headers = "Accept=application/json")
     public ResponseEntity<?> eliminarBoleto(@PathVariable Long id) {
         try {
@@ -111,7 +111,7 @@ public class RestControllerBoleto {
     }
 
 
-    //cancelar boleto
+    //cancelar boleto, no implementado
     @PutMapping(value = "cancelar/{id}", headers = "Accept=application/json")
     public ResponseEntity<?> cancelarBoleto(@PathVariable Long id) {
         try {

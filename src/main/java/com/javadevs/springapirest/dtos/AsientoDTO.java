@@ -14,6 +14,6 @@ public class AsientoDTO {
     private Integer columna;
     private String tipoAsiento;
     private Boolean estado;
-    private Long idSala; // Solo el ID de la sala
-    private String nombreSala; // O nombre si lo necesitas
+    private Long idSala;
+    private String nombreSala;
 }

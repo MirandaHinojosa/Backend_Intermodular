@@ -20,8 +20,7 @@ public interface IBoletoRepository extends JpaRepository<Boletos, Long>{
     @Query("SELECT b FROM Boletos b WHERE b.usuario.idUsuario = :usuarioId")
     List<Boletos> findByUsuarioId(@Param("usuarioId") Long usuarioId);
 
-
-
+    //hacemos que no usamos pero pueden ser utiles en algun momento
 
     // Boletos por estado
     List<Boletos> findByEstado(String estado);

@@ -28,7 +28,7 @@ public class Boletos {
     private Sesiones sesion;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = true) // Puede ser null
+    @JoinColumn(name = "usuario_id", nullable = true) // Puede ser null, al principio lo pensé para boletos que no sea comprados por usuaris
     @JsonIgnoreProperties({"boletos", "roles", "password"})
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Solo para escritura desde JSON
     private Usuarios usuario;

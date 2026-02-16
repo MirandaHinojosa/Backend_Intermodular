@@ -36,7 +36,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 try {
                     String username = jwtGenerador.obtenerUsernameDeJwt(token);
 
-                    // Obtener el rol del token (debes agregar esta funcionalidad a JwtGenerador)
+                    // Obtener el rol del token
                     String role = getRoleFromToken(token);
 
                     // Crear autenticación
@@ -86,9 +86,9 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
     private String getRoleFromToken(String token) {
         try {
             // Extraer el claim "role" del token
-            // Necesitarás agregar este método a JwtGenerador
+
             io.jsonwebtoken.Claims claims = io.jsonwebtoken.Jwts.parser()
-                    .setSigningKey("firma")  // Usa tu firma real
+                    .setSigningKey("firma")
                     .parseClaimsJws(token)
                     .getBody();
 

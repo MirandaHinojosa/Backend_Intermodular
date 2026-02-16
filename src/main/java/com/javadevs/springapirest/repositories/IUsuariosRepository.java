@@ -13,7 +13,7 @@ public interface IUsuariosRepository extends JpaRepository<Usuarios,Long> {
     //Método para poder buscar un usuario mediante su nombre
     Optional<Usuarios> findByUsername(String username);
 
-    // NUEVO: Método para buscar por email
+    //Método para buscar por email
     Optional<Usuarios> findByEmail(String email);
 
     //Método para poder verificar si un usuario existe en nuestra base de datos
